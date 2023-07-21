@@ -180,6 +180,69 @@
                 <img src="images/slider_shape04.png" alt="shape">
             </div>
         </section>
+                
+                <style>
+/* CSS */
+.video-background {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.video-background video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1.5;
+     width: 100%;
+}
+
+.text-overlay h1 {
+    font-size: 36px;
+}
+
+.text-overlay p {
+    font-size: 24px;
+}
+.custom-image {
+    max-width: 100%;
+    height: 650px;
+    /* You can set additional styling for the image here */
+}
+
+/* Adjust font sizes and positioning as needed */
+
+                </style>
+              <section class="video-background">
+    <video autoplay loop muted playsinline>
+        <source src="images/video.mp4" type="video/mp4">
+        <!-- Add additional video formats for compatibility with different browsers -->
+        <!-- <source src="assets/video/video.webm" type="video/webm"> -->
+        <!-- <source src="assets/video/video.ogv" type="video/ogg"> -->
+        Your browser does not support the video tag.
+    </video>
+    <div class="text-overlay">
+        <img src="images/words.png" alt="word" class="custom-image">
+        <!-- Add more text elements as needed -->
+    </div>
+</section>
+
         <!-- slider-area-end -->
 
         <!-- NFT-item-area -->
