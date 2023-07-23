@@ -96,16 +96,21 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">Bumboo Chat</div>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="input-box">
-            <input type="text" id="messageInput" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+    <div class="chat-header">Bumboo Chat</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-box">
+        <input type="text" id="messageInputChat" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
     </div>
+</div>
+<div class="input-box">
+    <input type="text" id="nameInputChat" placeholder="Your Name">
+    <input type="text" id="messageInputSetName" placeholder="Type your message...">
+    <button onclick="setNameAndSendMessage()">Send</button>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script>
-      const contractAddress = '0xc02cba78bbf6c5bff675214ac1fc685e1fbc41b2'; // Replace with your smart contract address
+      const contractAddress = '0x3e7914b28bc81cb2785d0cd1aecf88a396d19f49'; // Replace with your smart contract address
 const abi = [
   {
     "inputs": [
@@ -159,9 +164,40 @@ const abi = [
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      }
+    ],
+    "name": "setName",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_addr",
+        "type": "address"
+      }
+    ],
+    "name": "getNameForAddress",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
-]
-;
+];
 
    let contract; // Declare contract variable outside functions
 
@@ -180,7 +216,7 @@ const abi = [
 
        async function sendMessage() {
     const name = "Your Name"; // Replace "Your Name" with the name of the sender (can be any string)
-    const message = document.getElementById('messageInput').value;
+    const message = document.getElementById('messageInputChat').value;
     if (message.trim() === '') return;
 
     await connectWalletAndLoadChat(); // Ensure wallet is connected before sending the message
@@ -189,39 +225,77 @@ const abi = [
         const fromAddress = web3.givenProvider.selectedAddress;
 
         // Provide both "_name" and "_data" parameters when calling "addString"
-        await contract.methods.addString(name, message).send({ from: fromAddress });
-        document.getElementById('messageInput').value = '';
+        await contract.methods.addString(fromAddress, message).send({ from: fromAddress });
+        document.getElementById('messageInputChat').value = '';
         loadChat();
     } catch (error) {
         console.error('Error sending message:', error);
     }
 }
 
+async function setNameAndSendMessage() {
+    const name = document.getElementById('nameInputChat').value;
+    if (name.trim() === '') return;
+
+    await connectWalletAndLoadChat();
+
+    try {
+        const fromAddress = web3.givenProvider.selectedAddress;
+        await contract.methods.setName(name).send({ from: fromAddress, value: web3.utils.toWei("1", "ether") });
+        document.getElementById('nameInputChat').value = ''; // Clear the name input field after setting the name
+
+        // Sending a message after setting the name (optional)
+        const message = document.getElementById('messageInputSetName').value;
+        if (message.trim() !== '') {
+            await contract.methods.addString(name, message).send({ from: fromAddress });
+            document.getElementById('messageInputSetName').value = ''; // Clear the message input field after sending the message
+        }
+
+        loadChat();
+    } catch (error) {
+        console.error('Error setting name or sending message:', error);
+    }
+}
+
+
+
+// ... (existing code) ...
+
 async function loadChat() {
+    // ... (existing code) ...
     const chatBox = document.getElementById('chatBox');
     chatBox.innerHTML = '';
 
     const recentStrings = await contract.methods.getRecentStrings().call();
-
-    recentStrings.forEach(stringEntry => {
+    recentStrings.forEach(async stringEntry => {
         const sender = stringEntry.sender;
         const message = stringEntry.data;
         const timestamp = new Date(stringEntry.timestamp * 1000).toLocaleString();
 
+        // Fetch the name from the contract for the sender's address
+        const name = await contract.methods.getNameForAddress(sender).call();
+
         const chatEntry = document.createElement('div');
-        chatEntry.innerHTML = `<strong>${sender}</strong> (${timestamp}): ${message}<br><br>`;
+        // Use the name if available, or fallback to the sender's address in Ethereum address format
+        const displayName = name.trim() !== '' ? name : (sender === web3.givenProvider.selectedAddress ? "Your Name" : formatAddress(sender));
+        chatEntry.innerHTML = `<strong>${displayName}</strong> (${timestamp}): ${message}<br><br>`;
         chatBox.appendChild(chatEntry);
     });
 }
 
+function formatAddress(address) {
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-            if (window.ethereum && window.ethereum.isMetaMask) {
-                // Check if the user has MetaMask or another compatible wallet
-                await connectWalletAndLoadChat();
-            } else {
-                alert('Please install MetaMask or any other compatible Ethereum wallet to use this chat application.');
-            }
-        });
+    if (window.ethereum && window.ethereum.isMetaMask) {
+        // Check if the user has MetaMask or another compatible wallet
+        await connectWalletAndLoadChat();
+    } else {
+        alert('Please install MetaMask or any other compatible Ethereum wallet to use this chat application.');
+    }
+});
+
 
     </script>
 </body>
