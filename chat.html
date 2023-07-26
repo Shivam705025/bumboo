@@ -247,7 +247,7 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
 <script>
-const contractAddress = '0xcdafbc765d2c7f45276730fa1fdcbc503fa5108a'; // Replace with your smart contract address
+const contractAddress = '0xfb85fd0c04ac6b8982be04afb9336f63da770422'; // Replace with your smart contract address
 const abi = [
   {
     "inputs": [],
@@ -316,24 +316,24 @@ const abi = [
     "type": "function"
   },
   {
-  "inputs": [
-    {
-      "internalType": "address",
-      "name": "_addr",
-      "type": "address"
-    }
-  ],
-  "name": "getNameForAddress",
-  "outputs": [
-    {
-      "internalType": "string",
-      "name": "",
-      "type": "string"
-    }
-  ],
-  "stateMutability": "view",
-  "type": "function"
-},
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_addr",
+        "type": "address"
+      }
+    ],
+    "name": "getNameForAddress",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
   {
     "inputs": [
       {
@@ -352,11 +352,6 @@ const abi = [
       {
         "internalType": "address",
         "name": "_to",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_tokenAddress",
         "type": "address"
       },
       {
@@ -417,7 +412,8 @@ const abi = [
     "stateMutability": "nonpayable",
     "type": "function"
   }
-];
+]
+;
 
    let contract; // Declare contract variable outside functions
 
